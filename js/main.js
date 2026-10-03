@@ -28,10 +28,14 @@ const times = () => store.all().map((s) => s.time);
 // Records beaten by the last solve; shown until the next solve starts.
 let records = [];
 
+// Keep-awake diagnostic captured at the end of each solve; tap the version label to see it.
+let lastWakeStatus = 'no solve timed yet';
+
 const timer = createTimer({
   onState(state) {
     if (state === 'armed') records = [];
     if (state === 'running') wakeLock.enable();
+    if (state === 'stopped') lastWakeStatus = wakeLock.status();
     if (state === 'stopped') wakeLock.disable();
     if (state === 'idle' && records.length) {
       ui.renderPadState('pb', `New best ${records.join(' + ')}!`);
@@ -78,6 +82,7 @@ window.addEventListener('keyup', (e) => {
 
 // ---------- Controls ----------
 ui.els.btnNewScramble.addEventListener('click', newScramble);
+ui.els.version.addEventListener('click', () => alert(`Last solve keep-awake status:\n${lastWakeStatus}`));
 ui.els.btnHistory.addEventListener('click', () => ui.showHistory(true));
 ui.els.btnCloseHistory.addEventListener('click', () => ui.showHistory(false));
 ui.els.btnStats.addEventListener('click', () => statsView.open());

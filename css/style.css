@@ -161,6 +161,7 @@ body.running .hint { visibility: hidden; }
 
 .version {
   grid-column: 1 / -1;
+  cursor: pointer;  /* tappable on iOS: shows keep-awake diagnostic */
   text-align: center;
   font-size: 11px;
   color: var(--muted);
