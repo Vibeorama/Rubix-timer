@@ -15,6 +15,7 @@ const ASSETS = [
   'js/format.js',
   'js/ui.js',
   'js/wakelock.js',
+  'js/keepawake-video.js',
   'js/confetti.js',
   'manifest.webmanifest',
   'icons/icon.svg',

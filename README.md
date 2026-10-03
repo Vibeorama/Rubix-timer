@@ -26,7 +26,8 @@ js/stats.js           best / average-of-N
 js/scramble.js        3x3 scramble generator
 js/format.js          time/date formatting
 js/ui.js              DOM rendering
-js/wakelock.js        keeps screen awake while timing
+js/wakelock.js        keeps screen awake while timing (Wake Lock API + video fallback)
+js/keepawake-video.js silent looping video for the iOS fallback
 js/confetti.js        confetti burst on new records
 sw.js                 offline cache (named after the version)
 ```
