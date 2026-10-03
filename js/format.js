@@ -18,3 +18,11 @@ export function formatDate(timestamp) {
     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
   });
 }
+
+/** Compact axis label: "25", "25.5" or "1:05". */
+export function formatAxisTime(ms) {
+  const s = Math.round(ms / 100) / 10;
+  if (s < 60) return Number.isInteger(s) ? String(s) : s.toFixed(1);
+  const whole = Math.round(s);
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`;
+}

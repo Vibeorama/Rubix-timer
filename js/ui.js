@@ -18,6 +18,8 @@ export const els = {
   history: $('history'),
   solveList: $('solve-list'),
   btnHistory: $('btn-history'),
+  btnStats: $('btn-stats'),
+  btnCloseStats: $('btn-close-stats'),
   btnCloseHistory: $('btn-close-history'),
   btnNewScramble: $('btn-new-scramble'),
   btnClear: $('btn-clear'),

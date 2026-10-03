@@ -32,7 +32,8 @@
 
   <footer class="bottom">
     <button class="btn" id="btn-history" type="button">History</button>
-    <button class="btn" id="btn-new-scramble" type="button">New scramble</button>
+    <button class="btn" id="btn-stats" type="button">Stats</button>
+    <button class="btn" id="btn-new-scramble" type="button">Scramble</button>
     <div class="version" id="version"></div>
   </footer>
 
@@ -43,6 +44,37 @@
     </div>
     <ol class="solves" id="solve-list"></ol>
     <button class="btn danger" id="btn-clear" type="button">Clear all</button>
+  </section>
+
+  <section class="sheet" id="stats" hidden>
+    <div class="sheet-head">
+      <h2>Stats</h2>
+      <button class="btn" id="btn-close-stats" type="button">Close</button>
+    </div>
+    <div class="stats stats-4">
+      <div class="stat"><span class="label">Avg</span><span class="value" id="stats-mean">–</span></div>
+      <div class="stat"><span class="label">Top 10</span><span class="value" id="stats-top">–</span></div>
+      <div class="stat"><span class="label">Solves</span><span class="value" id="stats-count">0</span></div>
+      <div class="stat"><span class="label">Days</span><span class="value" id="stats-days">0</span></div>
+    </div>
+    <h3 class="chart-title">All-time average over time</h3>
+    <div class="legend">
+      <span><i class="key key-1"></i>All solves</span>
+      <span><i class="key key-2"></i>Top 10 solves</span>
+    </div>
+    <div class="ranges" id="chart-ranges" role="group" aria-label="Time range">
+      <button type="button" data-range="day">1D</button>
+      <button type="button" data-range="week">1W</button>
+      <button type="button" data-range="month">1M</button>
+      <button type="button" data-range="year">1Y</button>
+      <button type="button" data-range="all" aria-pressed="true">All</button>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="chart" aria-label="All-time average solve time over time"></canvas>
+      <p class="chart-empty" id="chart-empty" hidden>No solves yet</p>
+    </div>
+    <p class="chart-readout" id="chart-readout"></p>
+    <p class="chart-help">Pinch to zoom · drag to pan · tap a point for details</p>
   </section>
 
   <script src="js/version.js"></script>

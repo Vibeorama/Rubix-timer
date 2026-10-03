@@ -6,10 +6,12 @@ import { summarize, personalBests, newRecords } from './stats.js';
 import { generateScramble } from './scramble.js';
 import { createWakeLock } from './wakelock.js';
 import { burst } from './confetti.js';
+import { createStatsView } from './statsview.js';
 import * as ui from './ui.js';
 
 const store = createStore();
 const wakeLock = createWakeLock();
+const statsView = createStatsView(store);
 
 function refresh(solves) {
   const summary = summarize(solves);
@@ -78,6 +80,8 @@ window.addEventListener('keyup', (e) => {
 ui.els.btnNewScramble.addEventListener('click', newScramble);
 ui.els.btnHistory.addEventListener('click', () => ui.showHistory(true));
 ui.els.btnCloseHistory.addEventListener('click', () => ui.showHistory(false));
+ui.els.btnStats.addEventListener('click', () => statsView.open());
+ui.els.btnCloseStats.addEventListener('click', () => statsView.close());
 
 ui.els.solveList.addEventListener('click', (e) => {
   const id = e.target.closest('.del')?.dataset.id;
