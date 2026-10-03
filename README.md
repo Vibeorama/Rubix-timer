@@ -35,8 +35,10 @@ The version shows at the bottom of the app; when a phone picks up a new release 
 
 ## Deploy
 
-Pushes to `main` deploy via `.github/workflows/pages.yml`.
-One-time setup: repo **Settings → Pages → Source: GitHub Actions**.
+Pushes to `main` are mirrored to the `gh-pages` branch by `.github/workflows/pages.yml`;
+GitHub Pages serves that branch (Settings → Pages → Deploy from a branch → `gh-pages` / root).
+
+Live: https://vibeorama.github.io/Rubix-timer/
 
 ## Run locally
 
