@@ -17,6 +17,7 @@ Add to Home Screen in Safari (Share → Add to Home Screen) for full-screen, off
 ```
 index.html            markup
 css/style.css         all styling (dark theme tokens in :root)
+js/version.js         app version (bump on release)
 js/main.js            wiring: connects modules + event listeners
 js/timer.js           timer state machine (no DOM)
 js/store.js           solve persistence (localStorage)
@@ -24,8 +25,13 @@ js/stats.js           best / average-of-N
 js/scramble.js        3x3 scramble generator
 js/format.js          time/date formatting
 js/ui.js              DOM rendering
-sw.js                 offline cache (bump VERSION on release)
+sw.js                 offline cache (named after the version)
 ```
+
+## Releasing
+
+Bump `APP_VERSION` in `js/version.js` (MAJOR.MINOR.PATCH) with every change you ship.
+The version shows at the bottom of the app; when a phone picks up a new release it reloads itself to it.
 
 ## Deploy
 

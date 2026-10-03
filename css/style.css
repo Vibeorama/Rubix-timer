@@ -147,6 +147,14 @@ body.running .hint { visibility: hidden; }
   min-height: 44px;
 }
 
+.version {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .btn:active { background: var(--border); }
 .btn.danger { color: var(--armed); }
 

@@ -1,11 +1,12 @@
 // Offline support: serve from cache, refresh cache in the background.
-// Bump VERSION when shipping changes to force a clean cache.
-const VERSION = 'v1';
-const CACHE = `cube-timer-${VERSION}`;
+// Cache is named after APP_VERSION (js/version.js): bumping it ships a release.
+importScripts('js/version.js');
+const CACHE = `cube-timer-v${self.APP_VERSION}`;
 const ASSETS = [
   './',
   'index.html',
   'css/style.css',
+  'js/version.js',
   'js/main.js',
   'js/timer.js',
   'js/store.js',
@@ -19,7 +20,7 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map((url) => new Request(url, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {

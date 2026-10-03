@@ -21,6 +21,7 @@ export const els = {
   btnCloseHistory: $('btn-close-history'),
   btnNewScramble: $('btn-new-scramble'),
   btnClear: $('btn-clear'),
+  version: $('version'),
 };
 
 const HINTS = {
@@ -81,4 +82,8 @@ export function renderHistory(solves, bestTime) {
 
 export function showHistory(open) {
   els.history.hidden = !open;
+}
+
+export function renderVersion(version) {
+  els.version.textContent = `v${version}`;
 }

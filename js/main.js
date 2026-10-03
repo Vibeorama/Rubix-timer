@@ -82,7 +82,13 @@ refresh(store.all());
 newScramble();
 ui.renderPadState('idle');
 ui.renderTime(0);
+ui.renderVersion(self.APP_VERSION);
 
 if ('serviceWorker' in navigator) {
+  // When a new release's service worker takes over, reload once to show it.
+  // Skipped on first install (no previous controller).
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), { once: true });
+  }
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
