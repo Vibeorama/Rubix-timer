@@ -5,7 +5,8 @@
 //   mouse wheel      → zoom (desktop)
 //
 // Generic: knows nothing about cubes. Points are { t, ...values }; series are
-// { key, color } and read point[key].
+// { key, color, type? } and read point[key]. type 'dots' draws a faint scatter
+// layer underneath; the default draws a 2px line.
 
 const MIN_SPAN = 10 * 60 * 1000;          // 10 minutes
 const PAD = { top: 12, right: 12, bottom: 26, left: 46 };
@@ -182,7 +183,19 @@ export function createTimeChart(canvas, { series, formatValue, onSelect }) {
     ctx.lineWidth = 2;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    for (const s of series) {
+    // dot layers first, so lines stay on top
+    for (const s of series.filter((x) => x.type === 'dots')) {
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = 0.5;
+      const r = plotW() / Math.max(1, b - a) > 6 ? 3 : 2; // smaller when dense
+      for (let i = a; i <= b; i++) {
+        ctx.beginPath();
+        ctx.arc(xOf(points[i].t), yOf(points[i][s.key]), r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+    for (const s of series.filter((x) => x.type !== 'dots')) {
       ctx.strokeStyle = s.color;
       ctx.beginPath();
       for (let i = a; i <= b; i++) {

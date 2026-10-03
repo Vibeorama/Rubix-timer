@@ -7,6 +7,7 @@ export const TOP_N = 10;
  * as of that solve:
  *   mean  – mean of every solve so far
  *   topN  – mean of the best TOP_N solves so far (fewer while < TOP_N solves)
+ *   time  – this solve's own time
  */
 export function computeProgress(solves) {
   const sorted = [...solves].sort((a, b) => a.date - b.date);
@@ -25,6 +26,7 @@ export function computeProgress(solves) {
     points.push({
       t: s.date,
       n: i + 1,
+      time: s.time,
       mean: sum / (i + 1),
       topN: top.reduce((a, b) => a + b, 0) / top.length,
     });

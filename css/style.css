@@ -252,6 +252,13 @@ body.running .hint { visibility: hidden; }
 }
 .key-1 { background: var(--series-1); }
 .key-2 { background: var(--series-2); }
+.legend .key-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: .7;
+}
 
 .ranges {
   display: grid;

@@ -18,13 +18,14 @@ export function createStatsView(store) {
 
   const chart = createTimeChart($('chart'), {
     series: [
+      { key: 'time', color: css('--muted'), type: 'dots' },
       { key: 'mean', color: css('--series-1') },
       { key: 'topN', color: css('--series-2') },
     ],
     formatValue: formatAxisTime,
     onSelect(p) {
       readout.textContent = p
-        ? `${formatDate(p.t)} · solve #${p.n} · avg ${formatTime(p.mean)} · top ${TOP_N} ${formatTime(p.topN)}`
+        ? `${formatDate(p.t)} · #${p.n} ${formatTime(p.time)} · avg ${formatTime(p.mean)} · top ${TOP_N} ${formatTime(p.topN)}`
         : '';
     },
   });
