@@ -14,6 +14,7 @@ const ASSETS = [
   'js/scramble.js',
   'js/format.js',
   'js/ui.js',
+  'js/wakelock.js',
   'manifest.webmanifest',
   'icons/icon.svg',
   'icons/icon-180.png',

@@ -25,6 +25,7 @@ js/stats.js           best / average-of-N
 js/scramble.js        3x3 scramble generator
 js/format.js          time/date formatting
 js/ui.js              DOM rendering
+js/wakelock.js        keeps screen awake while timing
 sw.js                 offline cache (named after the version)
 ```
 

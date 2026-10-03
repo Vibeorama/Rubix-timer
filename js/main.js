@@ -4,9 +4,11 @@ import { createTimer } from './timer.js';
 import { createStore } from './store.js';
 import { summarize } from './stats.js';
 import { generateScramble } from './scramble.js';
+import { createWakeLock } from './wakelock.js';
 import * as ui from './ui.js';
 
 const store = createStore();
+const wakeLock = createWakeLock();
 
 function refresh(solves) {
   const summary = summarize(solves);
@@ -24,6 +26,8 @@ let showPb = false;
 const timer = createTimer({
   onState(state) {
     if (state === 'armed') showPb = false;
+    if (state === 'running') wakeLock.enable();
+    if (state === 'stopped') wakeLock.disable();
     ui.renderPadState(state === 'idle' && showPb ? 'pb' : state);
   },
   onTick: ui.renderTime,
