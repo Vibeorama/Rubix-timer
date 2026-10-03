@@ -2,9 +2,10 @@
 
 import { createTimer } from './timer.js';
 import { createStore } from './store.js';
-import { summarize } from './stats.js';
+import { summarize, personalBests, newRecords } from './stats.js';
 import { generateScramble } from './scramble.js';
 import { createWakeLock } from './wakelock.js';
+import { burst } from './confetti.js';
 import * as ui from './ui.js';
 
 const store = createStore();
@@ -20,21 +21,28 @@ function newScramble() {
   ui.renderScramble(generateScramble());
 }
 
-// Keeps the "new best" highlight on screen until the next solve starts.
-let showPb = false;
+const times = () => store.all().map((s) => s.time);
+
+// Records beaten by the last solve; shown until the next solve starts.
+let records = [];
 
 const timer = createTimer({
   onState(state) {
-    if (state === 'armed') showPb = false;
+    if (state === 'armed') records = [];
     if (state === 'running') wakeLock.enable();
     if (state === 'stopped') wakeLock.disable();
-    ui.renderPadState(state === 'idle' && showPb ? 'pb' : state);
+    if (state === 'idle' && records.length) {
+      ui.renderPadState('pb', `New best ${records.join(' + ')}!`);
+    } else {
+      ui.renderPadState(state);
+    }
   },
   onTick: ui.renderTime,
   onStop(elapsed) {
-    const prevBest = summarize(store.all()).best;
+    const before = personalBests(times());
     store.add(elapsed);
-    showPb = prevBest === null || elapsed < prevBest;
+    records = newRecords(before, personalBests(times()));
+    if (records.length) burst();
     newScramble();
   },
 });

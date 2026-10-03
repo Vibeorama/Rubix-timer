@@ -24,3 +24,34 @@ export function summarize(solves) {
     ao12: averageOf(times, 12),
   };
 }
+
+/** Best (lowest) average-of-n over every window of n consecutive solves. */
+export function bestAverageOf(times, n) {
+  let bestAvg = null;
+  for (let end = n; end <= times.length; end++) {
+    const avg = averageOf(times.slice(end - n, end), n);
+    if (bestAvg === null || avg < bestAvg) bestAvg = avg;
+  }
+  return bestAvg;
+}
+
+/** All-time personal bests. */
+export function personalBests(times) {
+  return {
+    single: best(times),
+    ao5: bestAverageOf(times, 5),
+    ao12: bestAverageOf(times, 12),
+  };
+}
+
+const RECORD_LABELS = { single: 'single', ao5: 'Ao5', ao12: 'Ao12' };
+
+/**
+ * Records beaten between two personalBests() results, e.g. ['single', 'Ao5'].
+ * A first-ever value doesn't count: there must be a previous record to beat.
+ */
+export function newRecords(before, after) {
+  return Object.keys(RECORD_LABELS)
+    .filter((k) => before[k] !== null && after[k] !== null && after[k] < before[k])
+    .map((k) => RECORD_LABELS[k]);
+}

@@ -7,6 +7,7 @@ Minimal, dark-mode Rubik's cube timer built for small phones (iPhone SE 2020). N
 - **Hold** the big pad until the time turns green, **release** to start.
 - **Tap anywhere** to stop. The time is saved automatically.
 - Stats: best, Ao5, Ao12 (WCA-style: drop best and worst).
+- Confetti when you beat your all-time best single, Ao5 or Ao12.
 - History: view and delete solves. Data is stored locally on the device (`localStorage`).
 - Desktop: spacebar works the same as the pad.
 
@@ -26,6 +27,7 @@ js/scramble.js        3x3 scramble generator
 js/format.js          time/date formatting
 js/ui.js              DOM rendering
 js/wakelock.js        keeps screen awake while timing
+js/confetti.js        confetti burst on new records
 sw.js                 offline cache (named after the version)
 ```
 

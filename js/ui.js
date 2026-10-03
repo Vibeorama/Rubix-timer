@@ -30,16 +30,15 @@ const HINTS = {
   ready: 'Release to start',
   running: '',
   stopped: '',
-  pb: 'New best!',
 };
 
 export function renderTime(ms) {
   els.time.textContent = formatTime(ms);
 }
 
-export function renderPadState(state) {
+export function renderPadState(state, hint = HINTS[state] ?? '') {
   els.pad.dataset.state = state;
-  els.hint.textContent = HINTS[state] ?? '';
+  els.hint.textContent = hint;
   document.body.classList.toggle('running', state === 'running');
 }
 
