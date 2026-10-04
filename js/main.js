@@ -66,6 +66,12 @@ pad.addEventListener('pointerup', (e) => {
   timer.release();
 });
 pad.addEventListener('pointercancel', () => timer.cancel());
+// iOS only grants the wake lock (and unmuted playback) inside a "real" user
+// gesture, which touchend is and pointerup may not be. touchend fires right
+// after the pointerup that started the timer, so retry from here.
+pad.addEventListener('touchend', () => {
+  if (timer.state === 'running') wakeLock.enable();
+});
 pad.addEventListener('contextmenu', (e) => e.preventDefault());
 
 // Spacebar for desktop use.
