@@ -34,9 +34,9 @@ let lastWakeStatus = 'no solve timed yet';
 const timer = createTimer({
   onState(state) {
     if (state === 'armed') records = [];
-    if (state === 'running') wakeLock.enable();
+    if (state === 'running') wakeLock.enable('start');
     if (state === 'stopped') lastWakeStatus = wakeLock.status();
-    if (state === 'stopped') wakeLock.disable();
+    if (state === 'stopped' || state === 'idle') wakeLock.disable();
     if (state === 'idle' && records.length) {
       ui.renderPadState('pb', `New best ${records.join(' + ')}!`);
     } else {
@@ -69,8 +69,9 @@ pad.addEventListener('pointercancel', () => timer.cancel());
 // iOS only grants the wake lock (and unmuted playback) inside a "real" user
 // gesture, which touchend is and pointerup may not be. touchend fires right
 // after the pointerup that started the timer, so retry from here.
+// 'ready' covers the case where touchend arrives before pointerup.
 pad.addEventListener('touchend', () => {
-  if (timer.state === 'running') wakeLock.enable();
+  if (timer.state === 'running' || timer.state === 'ready') wakeLock.enable('touchend');
 });
 pad.addEventListener('contextmenu', (e) => e.preventDefault());
 

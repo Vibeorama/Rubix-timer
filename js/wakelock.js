@@ -40,28 +40,26 @@ function createVideo() {
 
 export function createWakeLock() {
   let sentinel = null;
-  let pending = false;
   let wanted = false;
-  let apiError = null;
-  let videoError = null;
+  let log = []; // per-attempt results for the current solve, for status()
   const video = createVideo();
 
-  async function acquireApi() {
-    if (!('wakeLock' in navigator) || sentinel || pending) return;
-    pending = true;
+  // Every call makes a fresh request, even if an earlier one is still pending:
+  // on iOS the first attempt (outside a gesture) is pending-then-rejected while
+  // the retry from touchend (inside a gesture) is the one that can succeed.
+  async function acquireApi(source) {
+    if (!('wakeLock' in navigator) || sentinel) return;
     try {
       const lock = await navigator.wakeLock.request('screen');
+      log.push(`${source} lock ok`);
+      if (sentinel || !wanted) { lock.release().catch(() => {}); return; }
       sentinel = lock;
-      apiError = null;
       lock.addEventListener('release', () => {
         if (sentinel === lock) sentinel = null;
       });
-      if (!wanted) releaseApi(); // disabled while the request was pending
-      else video.pause();        // the real lock works; fallback not needed
+      video.pause(); // the real lock works; fallback not needed
     } catch (err) {
-      apiError = err.name;
-    } finally {
-      pending = false;
+      log.push(`${source} lock ${err.name}`);
     }
   }
 
@@ -70,40 +68,50 @@ export function createWakeLock() {
     sentinel = null;
   }
 
-  function startVideo() {
-    if (sentinel) return; // play() on a playing video is a harmless no-op
+  function startVideo(source) {
+    if (sentinel) return;
     if (canMixAudio) navigator.audioSession.type = 'ambient';
-    video.play().then(() => { videoError = null; }, (err) => { videoError = err.name; });
+    // play() on a playing video is a harmless no-op.
+    video.play().then(
+      () => {
+        log.push(`${source} video ok`);
+        if (sentinel || !wanted) video.pause();
+      },
+      (err) => log.push(`${source} video ${err.name}`),
+    );
+  }
+
+  function start(source) {
+    acquireApi(source);
+    startVideo(source);
   }
 
   // The OS drops the lock when the page is hidden; resume on return.
   document.addEventListener('visibilitychange', () => {
-    if (wanted && document.visibilityState === 'visible') {
-      acquireApi();
-      startVideo();
-    }
+    if (wanted && document.visibilityState === 'visible') start('visible');
   });
 
   return {
-    /** Safe to call repeatedly; call it from user-gesture handlers too. */
-    enable() {
+    /**
+     * Safe to call repeatedly; call it from user-gesture handlers too.
+     * `source` only labels the attempt in status().
+     */
+    enable(source = 'enable') {
+      if (!wanted) log = [];
       wanted = true;
-      acquireApi();
-      startVideo();
+      start(source);
     },
     disable() {
       wanted = false;
       video.pause();
       releaseApi();
     },
-    /** One-line diagnostic of both mechanisms, for debugging on a device. */
+    /** Diagnostic of both mechanisms, for debugging on a device. */
     status() {
-      const api = !('wakeLock' in navigator) ? 'unsupported'
-        : sentinel ? 'active' : apiError ?? 'off';
-      const vid = videoError
-        ?? (video.paused ? 'paused' : `playing ${video.currentTime.toFixed(1)}s`);
+      const api = !('wakeLock' in navigator) ? 'unsupported' : sentinel ? 'active' : 'off';
+      const vid = video.paused ? 'paused' : `playing ${video.currentTime.toFixed(1)}s`;
       const audio = canMixAudio ? `audio ${navigator.audioSession.type}` : 'muted';
-      return `wake lock: ${api} · video: ${vid} (${audio})`;
+      return `wake lock: ${api} · video: ${vid} (${audio})\n${log.join('\n') || 'no attempts'}`;
     },
   };
 }
