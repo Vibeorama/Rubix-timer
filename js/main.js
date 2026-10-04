@@ -10,7 +10,7 @@ import { createStatsView } from './statsview.js';
 import * as ui from './ui.js';
 
 const store = createStore();
-const wakeLock = createWakeLock();
+const wakeLock = createWakeLock({ onChange: () => renderPad(timer.state) });
 const statsView = createStatsView(store);
 
 function refresh(solves) {
@@ -28,20 +28,21 @@ const times = () => store.all().map((s) => s.time);
 // Records beaten by the last solve; shown until the next solve starts.
 let records = [];
 
-// Keep-awake diagnostic captured at the end of each solve; tap the version label to see it.
-let lastWakeStatus = 'no solve timed yet';
+function renderPad(state) {
+  if (state === 'idle' && records.length) {
+    ui.renderPadState('pb', `New best ${records.join(' + ')}!`);
+  } else if (state === 'idle' && !wakeLock.active) {
+    ui.renderPadState(state, 'Tap once to keep screen on');
+  } else {
+    ui.renderPadState(state);
+  }
+}
 
 const timer = createTimer({
   onState(state) {
     if (state === 'armed') records = [];
-    if (state === 'running') wakeLock.enable('start');
-    if (state === 'stopped') lastWakeStatus = wakeLock.status();
-    if (state === 'stopped' || state === 'idle') wakeLock.disable();
-    if (state === 'idle' && records.length) {
-      ui.renderPadState('pb', `New best ${records.join(' + ')}!`);
-    } else {
-      ui.renderPadState(state);
-    }
+    if (state === 'running') wakeLock.keepAlive();
+    renderPad(state);
   },
   onTick: ui.renderTime,
   onStop(elapsed) {
@@ -66,13 +67,6 @@ pad.addEventListener('pointerup', (e) => {
   timer.release();
 });
 pad.addEventListener('pointercancel', () => timer.cancel());
-// iOS only grants the wake lock (and unmuted playback) inside a "real" user
-// gesture, which touchend is and pointerup may not be. touchend fires right
-// after the pointerup that started the timer, so retry from here.
-// 'ready' covers the case where touchend arrives before pointerup.
-pad.addEventListener('touchend', () => {
-  if (timer.state === 'running' || timer.state === 'ready') wakeLock.enable('touchend');
-});
 pad.addEventListener('contextmenu', (e) => e.preventDefault());
 
 // Spacebar for desktop use.
@@ -87,9 +81,14 @@ window.addEventListener('keyup', (e) => {
   timer.release();
 });
 
+// Keep the screen awake. iOS only allows it from a short tap (a user
+// gesture), so try on every tap/click anywhere until it is granted.
+document.addEventListener('touchend', () => wakeLock.hold('tap'), true);
+document.addEventListener('click', () => wakeLock.hold('click'), true);
+
 // ---------- Controls ----------
 ui.els.btnNewScramble.addEventListener('click', newScramble);
-ui.els.version.addEventListener('click', () => alert(`Last solve keep-awake status:\n${lastWakeStatus}`));
+ui.els.version.addEventListener('click', () => alert(`Keep-awake status:\n${wakeLock.status()}`));
 ui.els.btnHistory.addEventListener('click', () => ui.showHistory(true));
 ui.els.btnCloseHistory.addEventListener('click', () => ui.showHistory(false));
 ui.els.btnStats.addEventListener('click', () => statsView.open());
@@ -108,7 +107,7 @@ ui.els.btnClear.addEventListener('click', () => {
 store.subscribe(refresh);
 refresh(store.all());
 newScramble();
-ui.renderPadState('idle');
+renderPad('idle');
 ui.renderTime(0);
 ui.renderVersion(self.APP_VERSION);
 
