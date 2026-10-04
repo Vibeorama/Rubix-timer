@@ -10,8 +10,8 @@ Minimal, dark-mode Rubik's cube timer built for small phones (iPhone SE 2020). N
 - Stats page: all-time average and top-10 average over time, every solve as a dot; pinch to zoom, drag to pan, 1D/1W/1M/1Y/All.
 - Confetti when you beat your all-time best single, Ao5 or Ao12.
 - History: view and delete solves. Data is stored locally on the device (`localStorage`).
-- Screen stays awake while the app is in use (after one short tap; released after 10 min idle).
-  Tap the version label for a keep-awake diagnostic.
+- Screen stays awake while the app is in use, after one short tap (iOS requires a tap);
+  released after 2 min idle, never during a solve. A banner shows when a tap is needed.
 - Desktop: spacebar works the same as the pad.
 
 Add to Home Screen in Safari (Share → Add to Home Screen) for full-screen, offline use.
@@ -29,8 +29,7 @@ js/stats.js           best / average-of-N
 js/scramble.js        3x3 scramble generator
 js/format.js          time/date formatting
 js/ui.js              DOM rendering
-js/wakelock.js        keeps screen awake while the app is in use (Wake Lock API + video fallback)
-js/keepawake-video.js silent looping video for the iOS fallback
+js/wakelock.js        keeps screen awake while the app is in use (Screen Wake Lock API)
 js/confetti.js        confetti burst on new records
 js/progress.js        all-time average / top-10 average series
 js/chart.js           canvas time chart with pinch zoom + pan

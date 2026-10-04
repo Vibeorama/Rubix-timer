@@ -31,17 +31,17 @@ let records = [];
 function renderPad(state) {
   if (state === 'idle' && records.length) {
     ui.renderPadState('pb', `New best ${records.join(' + ')}!`);
-  } else if (state === 'idle' && !wakeLock.active) {
-    ui.renderPadState(state, 'Tap once to keep screen on');
   } else {
     ui.renderPadState(state);
   }
+  ui.renderAwake(wakeLock.active || !wakeLock.supported);
 }
 
 const timer = createTimer({
   onState(state) {
     if (state === 'armed') records = [];
-    if (state === 'running') wakeLock.keepAlive();
+    if (state === 'running') wakeLock.setRunning(true);
+    if (state === 'stopped') wakeLock.setRunning(false);
     renderPad(state);
   },
   onTick: ui.renderTime,
@@ -83,12 +83,11 @@ window.addEventListener('keyup', (e) => {
 
 // Keep the screen awake. iOS only allows it from a short tap (a user
 // gesture), so try on every tap/click anywhere until it is granted.
-document.addEventListener('touchend', () => wakeLock.hold('tap'), true);
-document.addEventListener('click', () => wakeLock.hold('click'), true);
+document.addEventListener('touchend', () => wakeLock.hold(), true);
+document.addEventListener('click', () => wakeLock.hold(), true);
 
 // ---------- Controls ----------
 ui.els.btnNewScramble.addEventListener('click', newScramble);
-ui.els.version.addEventListener('click', () => alert(`Keep-awake status:\n${wakeLock.status()}`));
 ui.els.btnHistory.addEventListener('click', () => ui.showHistory(true));
 ui.els.btnCloseHistory.addEventListener('click', () => ui.showHistory(false));
 ui.els.btnStats.addEventListener('click', () => statsView.open());

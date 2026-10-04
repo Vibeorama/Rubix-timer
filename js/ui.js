@@ -24,6 +24,7 @@ export const els = {
   btnNewScramble: $('btn-new-scramble'),
   btnClear: $('btn-clear'),
   version: $('version'),
+  awake: $('awake'),
 };
 
 const HINTS = {
@@ -87,4 +88,9 @@ export function showHistory(open) {
 
 export function renderVersion(version) {
   els.version.textContent = `v${version}`;
+}
+
+/** Show the "tap to keep screen awake" prompt while the screen can auto-lock. */
+export function renderAwake(isAwake) {
+  els.awake.hidden = isAwake;
 }

@@ -7,6 +7,7 @@
   --ready: #3ddc84;
   --armed: #ff5c5c;
   --pb: #ffd166;
+  --warn: #ffb020;
   --series-1: #3987e5;   /* chart: all-solves average */
   --series-2: #d95926;   /* chart: top-10 average */
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
@@ -129,6 +130,35 @@ body.running .pad {
 
 body.running .hint { visibility: hidden; }
 
+/* "Tap to keep screen awake" prompt, pinned to the top of the pad */
+.pad { position: relative; }
+
+.awake {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--warn);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warn) 14%, transparent);
+  color: var(--warn);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: none; /* the tap goes to the pad underneath */
+  animation: awake-pulse 1.6s ease-in-out infinite;
+}
+.awake[hidden],
+body.running .awake { display: none; }
+
+@keyframes awake-pulse {
+  50% { opacity: .55; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .awake { animation: none; }
+}
+
 /* ---------- Confetti overlay ---------- */
 .confetti {
   position: fixed;
@@ -161,7 +191,6 @@ body.running .hint { visibility: hidden; }
 
 .version {
   grid-column: 1 / -1;
-  cursor: pointer;  /* tappable on iOS: shows keep-awake diagnostic */
   text-align: center;
   font-size: 11px;
   color: var(--muted);
