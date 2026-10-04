@@ -7,6 +7,7 @@ import { generateScramble } from './scramble.js';
 import { createWakeLock } from './wakelock.js';
 import { burst } from './confetti.js';
 import { createStatsView } from './statsview.js';
+import { getSetting, setSetting } from './settings.js';
 import * as ui from './ui.js';
 
 const store = createStore();
@@ -31,6 +32,10 @@ let records = [];
 function renderPad(state) {
   if (state === 'idle' && records.length) {
     ui.renderPadState('pb', `New best ${records.join(' + ')}!`);
+  } else if (timer.inspecting) {
+    ui.renderPadState(state, undefined, true);
+  } else if (state === 'idle' && getSetting('inspection')) {
+    ui.renderPadState(state, 'Tap to start inspection');
   } else {
     ui.renderPadState(state);
   }
@@ -39,12 +44,14 @@ function renderPad(state) {
 
 const timer = createTimer({
   onState(state) {
-    if (state === 'armed') records = [];
+    if (state === 'armed' || state === 'inspecting') records = [];
     if (state === 'running') wakeLock.setRunning(true);
     if (state === 'stopped') wakeLock.setRunning(false);
     renderPad(state);
   },
   onTick: ui.renderTime,
+  onInspect: ui.renderInspection,
+  inspectionEnabled: () => getSetting('inspection'),
   onStop(elapsed) {
     const before = personalBests(times());
     store.add(elapsed);
@@ -86,8 +93,19 @@ window.addEventListener('keyup', (e) => {
 document.addEventListener('touchend', () => wakeLock.hold(), true);
 document.addEventListener('click', () => wakeLock.hold(), true);
 
+// Leaving the app mid-inspection abandons it.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) timer.abortInspection();
+});
+
 // ---------- Controls ----------
 ui.els.btnNewScramble.addEventListener('click', newScramble);
+ui.els.btnInspection.addEventListener('click', () => {
+  const on = !getSetting('inspection');
+  setSetting('inspection', on);
+  ui.renderInspectionSetting(on);
+  renderPad(timer.state);
+});
 ui.els.btnHistory.addEventListener('click', () => ui.showHistory(true));
 ui.els.btnCloseHistory.addEventListener('click', () => ui.showHistory(false));
 ui.els.btnStats.addEventListener('click', () => statsView.open());
@@ -107,6 +125,7 @@ store.subscribe(refresh);
 refresh(store.all());
 newScramble();
 renderPad('idle');
+ui.renderInspectionSetting(getSetting('inspection'));
 ui.renderTime(0);
 ui.renderVersion(self.APP_VERSION);
 

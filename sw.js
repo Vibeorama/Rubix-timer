@@ -14,6 +14,7 @@ const ASSETS = [
   'js/scramble.js',
   'js/format.js',
   'js/ui.js',
+  'js/settings.js',
   'js/wakelock.js',
   'js/confetti.js',
   'js/progress.js',

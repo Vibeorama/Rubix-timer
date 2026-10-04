@@ -5,13 +5,15 @@ export function best(times) {
 }
 
 /**
- * WCA-style average of the last n solves: drop best and worst, mean the rest.
- * Returns null when there are fewer than n solves.
+ * Trimmed average of the last n solves: drop the best and worst solve
+ * (Ao5/Ao12, as the WCA does), or the best and worst 5% for longer averages
+ * (Ao100 drops 5 each side, as csTimer does). Null when fewer than n solves.
  */
 export function averageOf(times, n) {
   if (times.length < n) return null;
+  const trim = n <= 12 ? 1 : Math.ceil(n * 0.05);
   const sorted = times.slice(-n).sort((a, b) => a - b);
-  const trimmed = sorted.slice(1, -1);
+  const trimmed = sorted.slice(trim, -trim);
   return trimmed.reduce((sum, t) => sum + t, 0) / trimmed.length;
 }
 
@@ -22,6 +24,7 @@ export function summarize(solves) {
     best: best(times),
     ao5: averageOf(times, 5),
     ao12: averageOf(times, 12),
+    ao100: averageOf(times, 100),
   };
 }
 
@@ -41,10 +44,11 @@ export function personalBests(times) {
     single: best(times),
     ao5: bestAverageOf(times, 5),
     ao12: bestAverageOf(times, 12),
+    ao100: bestAverageOf(times, 100),
   };
 }
 
-const RECORD_LABELS = { single: 'single', ao5: 'Ao5', ao12: 'Ao12' };
+const RECORD_LABELS = { single: 'single', ao5: 'Ao5', ao12: 'Ao12', ao100: 'Ao100' };
 
 /**
  * Records beaten between two personalBests() results, e.g. ['single', 'Ao5'].

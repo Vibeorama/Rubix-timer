@@ -13,7 +13,7 @@ export const els = {
     best: $('stat-best'),
     ao5: $('stat-ao5'),
     ao12: $('stat-ao12'),
-    count: $('stat-count'),
+    ao100: $('stat-ao100'),
   },
   history: $('history'),
   solveList: $('solve-list'),
@@ -25,10 +25,12 @@ export const els = {
   btnClear: $('btn-clear'),
   version: $('version'),
   awake: $('awake'),
+  btnInspection: $('btn-inspection'),
 };
 
 const HINTS = {
   idle: 'Hold, release to start',
+  inspecting: 'Inspect · hold to start',
   armed: 'Keep holding…',
   ready: 'Release to start',
   running: '',
@@ -39,21 +41,42 @@ export function renderTime(ms) {
   els.time.textContent = formatTime(ms);
 }
 
-export function renderPadState(state, hint = HINTS[state] ?? '') {
+/** `focus` makes the pad cover the whole screen (solving or inspecting). */
+export function renderPadState(state, hint = HINTS[state] ?? '', focus = state === 'running') {
   els.pad.dataset.state = state;
   els.hint.textContent = hint;
-  document.body.classList.toggle('running', state === 'running');
+  document.body.classList.toggle('running', focus);
+  if (!focus || state === 'running') delete els.pad.dataset.inspect;
+}
+
+/** Inspection countdown: "15"…"1", then "+2" (15–17 s), then "DNF". */
+export function renderInspection(msLeft) {
+  let text, level;
+  if (msLeft > 0) {
+    text = String(Math.ceil(msLeft / 1000));
+    level = msLeft <= 3000 ? 'alert' : msLeft <= 7000 ? 'warn' : 'ok';
+  } else {
+    text = msLeft > -2000 ? '+2' : 'DNF';
+    level = 'alert';
+  }
+  els.time.textContent = text;
+  els.pad.dataset.inspect = level;
+}
+
+export function renderInspectionSetting(on) {
+  els.btnInspection.textContent = `Inspection: ${on ? 'on' : 'off'}`;
+  els.btnInspection.setAttribute('aria-pressed', String(on));
 }
 
 export function renderScramble(text) {
   els.scramble.textContent = text;
 }
 
-export function renderStats({ count, best, ao5, ao12 }) {
+export function renderStats({ best, ao5, ao12, ao100 }) {
   els.stats.best.textContent = formatTime(best);
   els.stats.ao5.textContent = formatTime(ao5);
   els.stats.ao12.textContent = formatTime(ao12);
-  els.stats.count.textContent = String(count);
+  els.stats.ao100.textContent = formatTime(ao100);
 }
 
 export function renderHistory(solves, bestTime) {
